@@ -20,4 +20,3 @@ pool.getConnection((err) => {
 });
 
 module.exports = pool.promise();
-ß
