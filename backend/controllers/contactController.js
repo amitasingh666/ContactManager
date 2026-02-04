@@ -1,7 +1,6 @@
 const { validationResult } = require("express-validator");
 const db = require("../config/db");
 
-// Get all contacts for logged-in user
 const getContacts = async (req, res) => {
     try {
         const { search, favorite, tag, page = 1, limit = 50 } = req.query;
@@ -10,35 +9,30 @@ const getContacts = async (req, res) => {
         let query = "SELECT * FROM contacts WHERE user_id = ?";
         const params = [userId];
 
-        // Add search filter
+        // this part is nnot working for now
         if (search) {
             query += " AND (name LIKE ? OR email LIKE ? OR phone LIKE ? OR company LIKE ?)";
             const searchPattern = `%${search}%`;
             params.push(searchPattern, searchPattern, searchPattern, searchPattern);
         }
 
-        // Add favorite filter
         if (favorite === "true") {
             query += " AND is_favorite = TRUE";
         }
 
-        // Add tag filter
         if (tag) {
             query += " AND tags LIKE ?";
             params.push(`%${tag}%`);
         }
-
-        // Add ordering
+    
         query += " ORDER BY created_at DESC";
 
-        // Add pagination
         const offset = (page - 1) * limit;
         query += " LIMIT ? OFFSET ?";
         params.push(parseInt(limit), parseInt(offset));
 
         const [contacts] = await db.query(query, params);
 
-        // Get total count for pagination
         let countQuery = "SELECT COUNT(*) as total FROM contacts WHERE user_id = ?";
         const countParams = [userId];
 
@@ -79,7 +73,7 @@ const getContacts = async (req, res) => {
     }
 };
 
-// Get single contact by ID
+
 const getContactById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -110,10 +104,10 @@ const getContactById = async (req, res) => {
     }
 };
 
-// Create new contact
+
 const createContact = async (req, res) => {
     try {
-        // Validate input
+        
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
@@ -158,10 +152,10 @@ const createContact = async (req, res) => {
     }
 };
 
-// Update contact
+
 const updateContact = async (req, res) => {
     try {
-        // Validate input
+        
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
@@ -174,7 +168,7 @@ const updateContact = async (req, res) => {
         const { name, phone, email, company, tags, notes, is_favorite } = req.body;
         const userId = req.userId;
 
-        // Check if contact exists and belongs to user
+        
         const [existingContacts] = await db.query(
             "SELECT id FROM contacts WHERE id = ? AND user_id = ?",
             [id, userId]
@@ -211,13 +205,13 @@ const updateContact = async (req, res) => {
     }
 };
 
-// Delete contact
+
 const deleteContact = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
 
-        // Check if contact exists and belongs to user
+        
         const [existingContacts] = await db.query(
             "SELECT id FROM contacts WHERE id = ? AND user_id = ?",
             [id, userId]
@@ -248,13 +242,12 @@ const deleteContact = async (req, res) => {
     }
 };
 
-// Toggle favorite status
 const toggleFavorite = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
 
-        // Check if contact exists and belongs to user
+        
         const [existingContacts] = await db.query(
             "SELECT is_favorite FROM contacts WHERE id = ? AND user_id = ?",
             [id, userId]
@@ -288,7 +281,7 @@ const toggleFavorite = async (req, res) => {
     }
 };
 
-// Get all unique tags
+
 const getTags = async (req, res) => {
     try {
         const userId = req.userId;
@@ -298,7 +291,7 @@ const getTags = async (req, res) => {
             [userId]
         );
 
-        // Extract and deduplicate tags
+    
         const tagsSet = new Set();
         contacts.forEach((contact) => {
             if (contact.tags) {

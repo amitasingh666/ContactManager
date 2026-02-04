@@ -13,7 +13,7 @@ const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
-// Validation rules for contact
+// Validation 
 const contactValidation = [
     body("name")
         .trim()
@@ -53,7 +53,7 @@ const contactValidation = [
         .withMessage("is_favorite must be a boolean"),
 ];
 
-// All routes require authentication
+//authentication
 router.use(authMiddleware);
 
 // Routes
