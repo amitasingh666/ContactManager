@@ -1,0 +1,8 @@
+.App {
+  min-height: 100vh;
+}
+
+/* Remove any default styles */
+* {
+  box-sizing: border-box;
+}
